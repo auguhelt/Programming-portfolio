@@ -1,4 +1,4 @@
-// Hoppebold
+// Bouncing ball made in processing with java
 int rad = 100;
 float xpos, ypos;    
 
