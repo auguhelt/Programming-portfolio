@@ -1,0 +1,35 @@
+// Figures made in processing with Java. 
+void setup(){
+  size(400,500);
+  background(255);
+}
+
+void draw(){
+  drawCircle(100,50,50);
+  drawEllipse(50,50,50,50);
+  tegnRektangel(300,50,50,50);
+  drawLine(50,200,50,100);
+  drawTriangle(300,300,100,300,300,100);
+}
+
+void drawCircle(int x, int y, int r){
+  circle(x,y,r);
+}
+
+
+void drawLine(int x, int y, int x2, int y2){
+  line(x,y,x2, y2);
+}
+
+
+void drawEllipse(int x, int y, int r, int e){
+  ellipse(x,y,r,e);
+}
+
+void tegnRektangel(int x, int y, int bredde, int højde) {
+  rect(x, y, bredde, højde);
+}
+
+void drawTriangle(int x, int y, int r, int x1, int y2, int r2){
+  triangle(x,y,r, x1, y2, r2);
+}
