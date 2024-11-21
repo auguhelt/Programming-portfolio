@@ -1,0 +1,51 @@
+// Hoppebold
+int rad = 100;
+float xpos, ypos;    
+
+float xspeed = 5.3;
+float yspeed = 3.6;
+
+int xdirection = 1;
+int ydirection = 1;
+
+float Rcolor = random(255);
+float Gcolor = random(255);
+float Bcolor = random(255);
+
+float gravity = 0.03;
+
+
+void setup() 
+{
+  size(1000, 1000);
+  noStroke();
+  ellipseMode(RADIUS);
+  
+  xpos = (200);
+  ypos = (200);
+  
+  print(Rcolor);
+}
+
+void draw() 
+{
+  background(255);
+  ellipse(xpos, ypos, rad, rad);
+  fill(Rcolor, Gcolor, Bcolor);
+  
+  xpos = xpos + ( xspeed * xdirection );
+  ypos = ypos + ( yspeed * ydirection );
+  
+  
+  if (xpos > width-rad || xpos < rad) {
+    xdirection *= -1;
+    Rcolor = random(255);
+
+  }
+  if (ypos > height-rad || ypos < rad) {
+    ydirection *= -1;
+    Gcolor = random(255);
+    
+  if (ypos > height){}
+  }
+}
