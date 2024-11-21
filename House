@@ -1,0 +1,25 @@
+// RG house made in processing with Java.
+
+void setup(){
+  size(1000, 1000);
+  background(255);
+  
+  tegnHus(100, 100, 100, #964B00);
+  tegnHus(400, 700, 70, #0000FF);
+  tegnHus(200, 400, 50, #990000);
+}
+
+void tegnHus(float rectx, float recty, float størelse, color c){
+  
+  fill(c);
+  rect(rectx, recty, størelse, størelse);
+  
+  fill(c);
+  triangle(rectx, recty, rectx + størelse/2, recty - størelse / 2, rectx + størelse, recty);
+  
+  fill(c);
+  rect(rectx + størelse * 0.60, recty + størelse * 0.4, størelse * 0.3, størelse * 0.60);
+  
+  fill(c);
+  rect(rectx + størelse * 0.15, recty + størelse * 0.2, størelse * 0.3, størelse * 0.3);
+}
