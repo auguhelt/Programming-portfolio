@@ -1,0 +1,201 @@
+// Snake game, made in processing with Java. 
+
+int snakeX = 500, snakeY = 500; 
+int minus = -1;
+int plus = 1;
+int tid = 25; //Før 1000
+float appelX = 750;
+float appelY = 500;
+float resetGame;
+boolean gameRunning = false;  
+boolean gameOver = false;     
+int startTime;
+float speedMultiplier = 1.0;
+
+PImage grass;
+PImage snake;
+
+ArrayList<Integer> circleX = new ArrayList<Integer>();
+ArrayList<Integer> circleY = new ArrayList<Integer>();
+ArrayList<Integer> timestamps = new ArrayList<Integer>();
+
+void setup() {
+  size(1000, 1000);
+  background(255);
+  fill(0, 255, 0);
+  noStroke();
+  grass = loadImage("grass.jpg");
+  grass.resize(1000, 1000);
+  snake = loadImage("snake.jpg");
+  snake.resize(1000, 1000);
+  
+}
+
+void draw() {
+  if (!gameRunning && !gameOver) {
+    displayStartScreen();
+  } else if (gameRunning) {
+    playGame();
+  } else if (gameOver) {
+    displayGameOverScreen();
+  }
+}
+
+void displayStartScreen() {
+  background(snake);
+  fill(255, 0, 0);
+  textSize(60);
+  textAlign(CENTER, CENTER);
+  text("Press any key to start", width / 2, height / 2);
+}
+
+void displayGameOverScreen() {
+  background(grass);
+  fill(255, 0, 0);
+  textSize(32);
+  textAlign(CENTER, CENTER);
+  text("Game Over", width / 2, height / 2 - 30);
+  text("Press 'X' to restart", width / 2, height / 2 + 30);
+}
+
+
+void playGame() {
+  background(grass);
+
+  fill(255, 0, 0);
+  ellipse(appelX-10, appelY, 15, 20);
+  ellipse(appelX, appelY, 15, 20);
+
+  if (millis() - startTime > 3000 && (snakeX < 0 || snakeX > width || snakeY < 0 || snakeY > height)) {
+    println("Game Over: Hit the border!");
+    gameOver = true;
+    gameRunning = false;
+    return;
+  }
+
+  fill(0);
+  if (upWASD || upPIL) {
+    snakeY += minus * speedMultiplier;
+  }
+  if (downWASD || downPIL) {
+    snakeY -= minus * speedMultiplier;
+  }
+  if (leftWASD || leftPIL) {
+    snakeX += minus * speedMultiplier;
+  }
+  if (rightWASD || rightPIL) {
+    snakeX -= minus * speedMultiplier;
+  }
+
+  circleX.add(snakeX);
+  circleY.add(snakeY);
+  timestamps.add(millis());
+
+  if (millis() - startTime > 3000) {
+    for (int i = 0; i < circleX.size() - 1; i++) {
+      int bodyX = circleX.get(i);
+      int bodyY = circleY.get(i);
+
+      if (millis() - timestamps.get(i) < 1000) continue;
+      if (dist(snakeX, snakeY, bodyX, bodyY) < 10) { 
+        println("Game Over: Collided with self!");
+        gameOver = true;
+        gameRunning = false;
+        return;
+      }
+    }
+  }
+
+  for (int i = circleX.size() - 1; i >= 0; i--) {
+    if (millis() - timestamps.get(i) > tid) {
+      circleX.remove(i);
+      circleY.remove(i);
+      timestamps.remove(i);
+    } else {
+      fill(csnake);
+      circle(circleX.get(i), circleY.get(i), 20);
+    }
+  }
+
+  if (dist(snakeX, snakeY, appelX, appelY) < 20) {
+    tid += 500;
+    appelX = random(20, width - 20);
+    appelY = random(20, height - 20);
+    speedMultiplier *= 1.1;
+    println("Apple eaten! New length: " + tid + ", Speed: " + speedMultiplier);
+  }
+}
+
+
+
+
+//KEYBINDS:
+
+boolean upWASD, downWASD, upPIL, downPIL, leftWASD, leftPIL, rightWASD, rightPIL;
+
+void keyPressed() {
+  stopd();
+  switch(keyCode) {
+    case 'w': 
+      upWASD = true;
+      break;
+    case UP:
+      upPIL = true;
+      break;
+    case 's': 
+      downWASD = true;
+      break;
+    case DOWN: 
+      downPIL = true;
+      break;
+    case 'd':
+      rightWASD = true;
+      break;
+    case RIGHT: 
+      rightPIL = true;
+      break;
+    case 'a':
+      leftWASD = true;
+      break;
+    case LEFT: 
+      leftPIL = true;
+      break;
+  }
+  
+  if (!gameRunning && !gameOver) {
+    gameRunning = true;
+    snakeX = 500;
+    snakeY = 500;
+    circleX.clear();
+    circleY.clear();
+    timestamps.clear();
+    speedMultiplier = 1.0;
+    tid = 1000;
+    startTime = millis();
+  } else if (gameOver && key == 'x' || key == 'X') {
+    gameOver = false;
+    gameRunning = true;
+    snakeX = 500;
+    snakeY = 500;
+    circleX.clear();
+    circleY.clear();
+    timestamps.clear();
+    speedMultiplier = 1.0;
+    tid = 1000;
+    startTime = millis();
+  }
+}
+
+
+
+
+void stopd(){
+  upWASD = false;
+  downWASD = false;
+  upPIL = false;
+  downPIL = false;
+  leftWASD = false;
+  leftPIL = false;
+  rightWASD = false;
+  rightPIL = false;
+}
