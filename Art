@@ -1,0 +1,74 @@
+// Art made in processing with Java.
+size(1000, 1500);
+strokeWeight(5);
+
+float fr = random(100);
+float l = random(50);
+float cfR = random(255);
+float cfG = random(255);
+float cfB = random(255);
+
+//oppe fra og ned
+line(360, 352, 360, 1060);
+line(522, 220, 522, 1236);
+line(585, 110, 582, 1324);
+line(675, 352, 675, 1060);
+
+// På tvers
+line(225, 528, 810, 528);
+line(200, 704, 855, 704);
+line(270, 836, 800, 836);
+line(315, 424, 720, 424);
+
+noStroke();
+//circle
+fill(25, 25, 125);
+circle(585, 100, 36);
+circle(200, 704, 36);
+
+fill(20, 0, 255);
+circle(522, 1236, 36);
+circle(855, 704, 36);
+
+//Firkanter
+for(float firkant1 = 382; firkant1 < 1060; firkant1 = firkant1 + l + fr){
+  fill(cfR, cfG, cfB);
+  square(360-(fr/2)+random(15), firkant1+l+fr, fr);
+  fr = random(50)+10;
+  l = random(50);
+  cfR = random(255);
+  cfG = random(255);
+  cfB = random(255);
+  }
+
+for(float firkant2 = 250; firkant2 < 1060; firkant2 = firkant2 + l + fr){
+  fill(cfR, cfG, cfB);
+  square(522-(fr/2)+random(15), firkant2+l+fr, fr);
+  fr = random(50)+10;
+  l = random(50);
+  cfR = random(255);
+  cfG = random(255);
+  cfB = random(255);
+  }
+  
+for(float firkant3 = 140; firkant3 < 1060; firkant3 = firkant3 + l + fr){
+  fill(cfR, cfG, cfB);
+  square(585-(fr/2)+random(15), firkant3+l+fr, fr);
+  fr = random(50)+10;
+  l = random(50);
+  cfR = random(255);
+  cfG = random(255);
+  cfB = random(255);
+  
+  }
+  
+for(float firkant4 = 382; firkant4 < 1060; firkant4 = firkant4 + l + fr){
+  fill(cfR, cfG, cfB);
+  square(675-(fr/2)+random(15), firkant4+l+fr, fr);
+  fr = random(50)+10;
+  l = random(50);
+  cfR = random(255);
+  cfG = random(255);
+  cfB = random(255);
+  }
+  
