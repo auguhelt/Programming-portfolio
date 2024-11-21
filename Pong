@@ -1,0 +1,191 @@
+//Pong game, made in processing with Java.
+
+int rad = 20;
+float xpos, ypos;    
+float xspeed = 5.3;
+float yspeed = 3.6;
+
+int xdirection = 1;
+int ydirection = 1;
+
+float Rcolor = random(255);
+float Gcolor = random(255);
+float Bcolor = random(255);
+
+float YRbat = (60);
+float YLbat = (940);
+int XRbat = (500);
+float XLbat = (500);
+int minus = -5;
+int plus = 5;
+float speedplus = 0.5;
+int l = 10;
+
+int Lpoint = 0;
+int Rpoint = 0;
+int highscore = 0;
+
+float sxpos, sypos;
+float sxspeed = 4.1;
+float syspeed = 2.6;
+void setup() 
+{
+  size(1000, 1000);
+  noStroke();
+  ellipseMode(RADIUS);
+  
+  xpos = (200);
+  ypos = (200);
+  sxpos = (200);
+  sypos = (200);
+  
+  
+  upR = false;  
+  downR = false;
+  upL = false;
+  downL = false;
+}
+
+void draw() 
+{
+  background(255);
+  fill(Rcolor, Gcolor, Bcolor);
+  ellipse(xpos, ypos, rad, rad);
+
+  
+  rect(YLbat, XLbat, 10, 100);
+  rect(YRbat, XRbat, 10, 100);
+
+  xpos = xpos + ( xspeed * xdirection );
+  ypos = ypos + ( yspeed * ydirection );
+  sxpos = sxpos + ( sxspeed * xdirection );
+  sypos = sypos + ( syspeed * ydirection );
+
+    if (upR) {
+    XRbat = XRbat-plus;
+  }
+    if (upL) {
+      XLbat = XLbat-plus;
+  }
+    if (downR) {
+    XRbat = XRbat-minus;
+  }
+    if (downL) {
+      XLbat = XLbat-minus;
+  }
+ 
+  
+  
+  if (xpos > width-rad || xpos < rad) {
+      //if(Rpoint == highscore) {
+        //fill(#FF0000);
+        //textSize(50);
+        //text("Blue won", 500, 500); 
+      //} else{
+          //fill(#0000FF);
+          //textSize(50);
+          //text("Red won", 500, 500);
+          //}
+      
+      xdirection *= -1;
+      //Rcolor = (255);
+      //Gcolor = (255);
+      //Bcolor = (255);
+      background(254);
+      fill(0);
+      textSize(50);
+      //text("Press enter to restart", 300, 500);
+      //super.stop();
+  }
+      
+  
+    
+  if (ypos > height-rad || ypos < rad) {
+    ydirection *= -1;
+    Rcolor = random(255);
+    Gcolor = random(255);
+    Bcolor = random(255);
+  }
+  
+  if ((xpos > YRbat && xpos < YRbat + 10 && ypos > XRbat && ypos < XRbat + 100) || 
+      (xpos > YLbat && xpos < YLbat + 10 && ypos > XLbat && ypos < XLbat + 100)) {
+    xdirection *= -1;
+    Rcolor = random(255);
+    Gcolor = random(255);
+    Bcolor = random(255);
+    xspeed = xspeed+speedplus;
+    yspeed = yspeed+speedplus;
+    }
+    
+  if (xpos > YRbat && xpos < YRbat + 10 && ypos > XRbat && ypos < XRbat + 100) {
+    Lpoint = Lpoint+1;
+  }
+  if (xpos > YLbat && xpos < YLbat + 10 && ypos > XLbat && ypos < XLbat + 100) {
+    Rpoint = Rpoint+1;
+  }
+    
+  if (Rpoint > highscore) {
+    highscore=Rpoint;
+    print(highscore);
+  }
+  
+  if (Lpoint > highscore) {
+    highscore=Lpoint;
+    print(highscore);
+  }
+  fill(#FF0000);
+  textSize(50);
+  text(Rpoint, 900, 950);
+  
+  fill(#0000FF);
+  textSize(50);
+  text(Lpoint, 100, 950);
+ 
+  fill(0);
+  textSize(50);
+  text(highscore, 500, 950);
+  
+//  if (highscore == 1) {
+//    fill(Rcolor, Gcolor, Bcolor);
+//    ellipse(sypos, sxpos, rad, rad);
+//   }
+}
+ 
+
+// BAT
+boolean upR, downR, upL, downL;
+
+void keyPressed() {
+    switch(keyCode) {
+      case 38: 
+        upL = true;
+        break;
+      case 87:
+        upR = true;
+        break;
+      case 40: 
+        downL = true;
+        break;
+      case 83: 
+        downR = true;
+        break;
+    }
+}
+
+void keyReleased() {
+    switch(keyCode) {
+      case 38: 
+        upL = false;
+        break;      
+      case 87:
+        upR = false;
+        break;
+      case 40: 
+        downL = false;
+        break;
+      case 83: 
+        downR = false;
+        break;
+    }
+}
+  
