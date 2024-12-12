@@ -1,0 +1,22 @@
+// Program som tjekket om det er et skudår eller ej. 
+
+int årstal = (int) 2000;
+
+print(årstal);
+
+if(årstal % 100 == 0){
+  if (årstal % 400 == 0){
+    print(" er et skudår");
+    super.stop();
+  }
+    else if (årstal % 100 == 0){
+     print(" er ikke et skudår");
+     super.stop();
+  }
+}
+else if (årstal % 4 == 0){
+  print(" er et skudår");
+  super.stop();
+}
+
+else print(" er ikke et skudår");
