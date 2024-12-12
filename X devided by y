@@ -1,0 +1,14 @@
+// Program checking if x can be devided by y
+
+int tal = (int) random(0, 1000);
+
+
+print(tal );
+if (tal % 5 == 0)
+    print(" kan deles med 5");
+
+else if (tal % 3 == 0)
+    print(" kan deles med 3");
+
+else
+  print(" kan ikke deles med 3 eller 5");    
