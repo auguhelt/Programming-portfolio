@@ -1,0 +1,45 @@
+float nummerben = 124;
+float benY = 80;
+float benX = 50;
+float benL = 60;
+
+float circlenum = 50;
+float circleR = 50;
+float circleY = 50;
+float circleX = 25;
+
+float Rcolor = 255;
+float Gcolor = 255;
+float Bcolor = 255;
+
+void setup(){
+  size(100000, 100);
+  background(255);
+  circle(circleR-20, circleY-10, circleX);
+  circle(circleR-25, circleY-15, circleX-15);
+  circle(circleR-15, circleY-15, circleX-15);
+  
+  fill(0);
+  circle(circleR-25, circleY-15, circleX-20);
+  fill(0);
+  circle(circleR-15, circleY-15, circleX-20);
+  fill(#FF0000);
+  circle(circleR-20, circleY-2, circleX-20);
+}
+
+void draw(){
+  fill(255);
+    for(nummerben = 124; nummerben > 0; nummerben --){
+      line(benX, benL, benX, benY);
+      benX = benX + 10; 
+      Rcolor = Rcolor - 10;
+      Gcolor = Gcolor - 25;
+      Bcolor = Bcolor - 5;
+  }
+ fill(Rcolor, Gcolor, Bcolor);
+    for(circlenum = 50; circlenum > 0; circlenum --){
+      circle(circleR, circleY, circleX);
+      circleR = circleR + 25;
+  }
+}
+  
