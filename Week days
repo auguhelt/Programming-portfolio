@@ -1,0 +1,30 @@
+// A program checking week days in processing using java.
+
+int ugedag;
+ugedag = 3;
+switch (ugedag) {
+case 1:
+  println("det er mandag :c");
+  break;
+case 2:
+  println("det er tirsdag");
+  break;
+case 3:
+  println("det er onsdag");
+  break;
+case 4:
+  println("det er torsdag");
+  break;
+case 5:
+  println("det er FREDAG!!!");
+  break;
+case 6:
+  println("det er lørdag");
+  break;
+case 7:
+  println("det er søndag");
+  break;
+default:
+  println("Det er ikke en ugedag");
+  break;
+}
