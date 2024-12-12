@@ -1,0 +1,26 @@
+// Checking 2 numbers and finding the higher one among them.
+
+float tal = random(1000);
+float tal2 = random(1000);
+
+if(tal < tal2)
+    println("Tal 2 er højest med", tal2);
+
+
+else if (tal > tal2)
+    println("Tal 1 er højest med", tal);
+
+if (tal % 2 == 0)
+  println("tal 1 er lige");
+  else 
+  println("tal 1 er ulige");
+  
+if (tal2 % 2 == 0)
+  println("tal 2 er lige");
+  else 
+  println("tal 2 er ulige");
+    
+  
+  
+  
+  
