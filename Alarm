@@ -1,0 +1,273 @@
+import controlP5.*;  // Importer biblioteket
+
+ControlP5 cp5start;
+ControlP5 cp5hovedmenu;
+ControlP5 cp5alarm;
+ControlP5 cp5streak;
+ControlP5 cp5indstillinger;
+DropdownList d1;
+
+boolean hovedmenu = false;
+boolean streak = false;
+boolean alarm = false;
+boolean indstillinger = false;
+boolean forside = true;
+
+String username = "";
+color baggrund;
+int temaNummer = 0;
+
+PImage tandhjul;
+PImage pil;
+
+int cnt = 0;
+
+String[] temaer = {"Neutral", "Lysstråler", "Havet", "Skovgrøn", "Solnedgang", "Cyber Punk", "Retro", "Minimalistisk", "Nattehimmel", "Pasteller", "Mørk og Stormfuld"};
+color[] temaFarveBaggrund = {
+  color(100, 100, 100),   // Neutral
+  color(255, 255, 255),  // Lysstråler
+  color(0, 102, 204),  // Havet
+  color(34, 139, 34),  // Skovgrøn
+  color(255, 99, 71),  // Solnedgang
+  color(148, 0, 211),  // Cyber Punk
+  color(255, 165, 0),  // Retro
+  color(200, 200, 200),  // Minimalistisk
+  color(0, 0, 0),  // Nattehimmel
+  color(255, 182, 193),  // Pasteller
+  color(50, 50, 50)  // Mørk og Stormfuld
+};
+
+color[] temaFarveKnapper = {
+  color(150, 150, 150),   // Neutral
+  color(200, 200, 200),  // Lysstråler
+  color(0, 150, 255),    // Havet
+  color(50, 205, 50),    // Skovgrøn
+  color(255, 140, 0),    // Solnedgang
+  color(200, 0, 255),    // Cyber Punk
+  color(255, 200, 0),    // Retro
+  color(150, 150, 150),  // Minimalistisk
+  color(50, 50, 100),    // Nattehimmel
+  color(255, 200, 200),  // Pasteller
+  color(100, 100, 100),  // Mørk og Stormfuld
+};
+
+color[] temaFarveTekst = {
+  color(255, 255, 255),   // Neutral
+  color(0, 0, 0),        // Lysstråler
+  color(255, 255, 255),  // Havet
+  color(255, 255, 255),  // Skovgrøn
+  color(255, 255, 255),  // Solnedgang
+  color(255, 255, 255),  // Cyber Punk
+  color(0, 0, 0),        // Retro
+  color(0, 0, 0),        // Minimalistisk
+  color(255, 255, 255),  // Nattehimmel
+  color(0, 0, 0),        // Pasteller
+  color(255, 255, 255)  // Mørk og Stormfuld
+};
+
+void setup() {
+  size(500, 750);
+//  background(#352A48);
+  tandhjul = loadImage("tandhjul.png");
+  tandhjul.resize(50, 50);
+  pil = loadImage("pil.png");
+  pil.resize(50, 50);
+
+  cp5start = new ControlP5(this);
+  cp5start.addButton("start")
+    .setPosition(width/2-200, height/2+150)
+    .setSize(400, 100)
+    .setColorBackground(temaFarveKnapper[temaNummer])
+    .setColorLabel(temaFarveTekst[temaNummer]);
+     
+  cp5start.addTextfield("username")
+    .setPosition(50, 250)
+    .setSize(400, 100)
+    .setFocus(true)
+    .setColorBackground(temaFarveKnapper[temaNummer])
+    .setColorLabel(temaFarveTekst[temaNummer]);
+    
+  cp5start.addTextfield("password")
+    .setPosition(50, 400)
+    .setSize(400, 100)
+    .setFocus(true)
+    .setColorBackground(temaFarveKnapper[temaNummer])
+    .setColorLabel(temaFarveTekst[temaNummer]);
+    
+    
+    
+  cp5hovedmenu = new ControlP5(this);
+  cp5hovedmenu.addButton("alarm")
+    .setPosition(width/2-150, height/2)
+    .setSize(100, 50)
+    .setColorBackground(temaFarveKnapper[temaNummer])
+    .setColorLabel(temaFarveTekst[temaNummer]);
+    
+  cp5hovedmenu.addButton("streak")
+    .setPosition(width/2+50, height/2)
+    .setSize(100, 50)
+   .setColorBackground(temaFarveKnapper[temaNummer])             
+   .setColorLabel(temaFarveTekst[temaNummer]);
+
+  cp5hovedmenu.addButton("indstillinger")
+    .setSize(50, 50)
+    .setPosition(450, 0)
+    .setImage(tandhjul);
+
+
+
+  cp5alarm = new ControlP5(this);
+  cp5alarm.addButton("tilbage")
+    .setPosition(0, 0)
+    .setSize(50, 50)
+    .setImage(pil);
+
+
+
+  cp5streak = new ControlP5(this);
+  cp5streak.addButton("tilbage")
+    .setPosition(0, 0)
+    .setSize(50, 50)
+    .setImage(pil);
+
+
+
+  cp5indstillinger = new ControlP5(this);
+  cp5indstillinger.addButton("tilbage")
+    .setPosition(0, 0)
+    .setSize(50, 50)
+    .setImage(pil);
+
+  cp5indstillinger.addSlider("lyd styrke")
+    .setPosition(50, 150)
+    .setSize(400, 100)
+   .setColorBackground(temaFarveKnapper[temaNummer])
+//   .setColorForeground(color(temaFarveKnapper[temaNummer], 200))     HVIS VI VIL HAVE EN ANDEN FARVE TIL SLIDEREN!
+   .setColorLabel(temaFarveTekst[temaNummer]);
+
+  d1 = cp5indstillinger.addDropdownList("myList-d1")
+    .setPosition(50, 275)
+    .setSize(400, 100);
+
+  customize(d1);
+  updateVisibility();
+  baggrund = 125;
+}
+
+void draw() {
+  if (forside) {
+    visForside();
+  } else if (hovedmenu) {
+    visHovedmenu();
+  } else if (alarm) {
+    visAlarm();
+  } else if (streak) {
+    visStreak();
+  } else if (indstillinger) {
+    visIndstillinger();
+  }
+}
+
+void customize(DropdownList ddl) {
+  ddl.setItemHeight(25);
+  ddl.setBarHeight(20);
+  for (int i = 0; i < temaer.length; i++) {
+    ddl.addItem(temaer[i], i);
+  }
+  ddl.setColorBackground(color(temaFarveKnapper[temaNummer]));
+  ddl.setColorActive(color(temaFarveKnapper[temaNummer], 150));
+  ddl.setColorForeground(color(temaFarveKnapper[temaNummer], 200));
+  ddl.setColorLabel(color(temaFarveTekst[temaNummer]));
+}
+
+void controlEvent(ControlEvent theEvent) {
+  String name = theEvent.getController().getName();
+  
+  if (name.equals("myList-d1")) {
+    temaNummer = (int) theEvent.getValue();
+    baggrund = temaFarveBaggrund[temaNummer];
+  }
+
+  if (name.equals("start")) {
+    forside = false;
+    streak = false;
+    hovedmenu = true;
+    indstillinger = false;
+  } else if (name.equals("alarm")) {
+    hovedmenu = false;
+    streak = false;
+    alarm = true;
+    indstillinger = false;
+  } else if (name.equals("streak")) {
+    alarm = false;
+    streak = true;
+    hovedmenu = false;
+    indstillinger = false;
+  } else if (name.equals("tilbage")) {
+    alarm = false;
+    streak = false;
+    hovedmenu = true;
+    indstillinger = false;
+  } else if (name.equals("indstillinger")) {
+    alarm = false;
+    streak = false;
+    hovedmenu = false;
+    indstillinger = true;
+  } 
+  updateVisibility();
+  username = cp5start.get(Textfield.class, "username").getText();
+}
+
+
+void updateVisibility() {
+  cp5start.setVisible(forside);
+  cp5hovedmenu.setVisible(hovedmenu);
+  cp5alarm.setVisible(alarm);
+  cp5streak.setVisible(streak);
+  cp5indstillinger.setVisible(indstillinger);
+}
+
+void visHovedmenu() {
+  fill(baggrund);
+  rect(0, 0, width, height);
+  fill(temaFarveTekst[temaNummer]);
+  textAlign(CENTER, CENTER);
+  textSize(32);
+  text("Velkommen tilbage "+username, width / 2, height / 4);
+}
+
+void visForside() {
+  fill(baggrund);
+  rect(0, 0, width, height);
+  fill(0);
+  textAlign(CENTER, CENTER);
+  textSize(32);
+  text("Velkommen!", width / 2, height / 4);
+}
+
+void visAlarm() {
+  fill(baggrund);
+  rect(0, 0, width, height);
+  fill(temaFarveTekst[temaNummer]);
+  textAlign(CENTER, CENTER);
+  textSize(32);
+  text("Alarm", width / 2, height / 4);
+}
+
+void visStreak() {
+  fill(baggrund);
+  rect(0, 0, width, height);
+  fill(temaFarveTekst[temaNummer]);
+  textAlign(CENTER, CENTER);
+  textSize(32);
+  text("Streak", width / 2, height / 4);
+}
+
+void visIndstillinger() {
+  fill(baggrund);
+  rect(0, 0, width, height);
+  fill(temaFarveTekst[temaNummer]);
+  textAlign(CENTER, CENTER);
+  textSize(32);
+  text("indstillinger", width / 2, height / 8);
+}
