@@ -1,27 +1,57 @@
 import controlP5.*;  // Importer biblioteket
+import processing.sound.*;
 
 ControlP5 cp5start;
 ControlP5 cp5hovedmenu;
 ControlP5 cp5alarm;
 ControlP5 cp5streak;
 ControlP5 cp5indstillinger;
-DropdownList d1;
-textSize();
+DropdownList tema;
+Textfield tidInput;
+Button startKnap;
+
+SoundFile alarm_1;
+
+// Her laver vi alle variablesne til vores program.
 boolean hovedmenu = false;
 boolean streak = false;
 boolean alarm = false;
 boolean indstillinger = false;
-boolean forside = true;
+boolean forside = true; //Grunden til at forside = true hvor alle andre = false er så vi kan loade den til at starte med. De andre bliver loadet når du trykker på en knap hvilke vi ikke kunne gøre med forsiden så den starter vi bare med at loade.
 
-String username = "";
+String username = ""; // Vi laver en string her til usernamet så vi sennere kan sætte baggrunden til at sige "velkomen tilbage (username)" dermed give en mere personlig føelse.
 color baggrund;
 int temaNummer = 0;
 
 PImage tandhjul;
 PImage pil;
 
-int cnt = 0;
+int alarmtilbage = 0;
+int alarmstartid;
+boolean alarmigang = false;
+boolean alarmstart = false;
+boolean alarmActive = false;
+color alarmColor = color(240);
 
+int totalSekunder;
+int sekunder;
+int minutter;
+int timer;
+int tilbage;
+
+int streakTal = 0;
+boolean registresøvn = true;
+int timerStartTid = 0;
+int timerTid = 18 * 60 * 60 * 1000;
+float penge = 0;
+float pengeMultiplikator = 1.5;
+
+int startX = 50;
+int boksStørelse = 50;
+int Mellemrum = 10;
+String[] ugedage = {"Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"};
+
+// Laver temaerne så vi kan ændre dem i fremtiden ----------------------------------------------------------------------------------------------------------------------
 String[] temaer = {"Neutral", "Lysstråler", "Havet", "Skovgrøn", "Solnedgang", "Cyber Punk", "Retro", "Minimalistisk", "Nattehimmel", "Pasteller", "Mørk og Stormfuld"};
 color[] temaFarveBaggrund = {
   color(100, 100, 100), // Neutral
@@ -65,13 +95,19 @@ color[] temaFarveTekst = {
   color(255, 255, 255)  // Mørk og Stormfuld
 };
 
+
 void setup() {
   size(500, 750);
+
+  // Loader billederne som skal være i mappen -----------------------------------------------------------------------------------------------
   tandhjul = loadImage("tandhjul.png");
   tandhjul.resize(50, 50);
   pil = loadImage("pil.png");
   pil.resize(50, 50);
+  textSize(50);
+  alarm_1 = new SoundFile(this, "kylling.mp3");
 
+  // START KNAPPER -----------------------------------------------------------------------------------------------
   cp5start = new ControlP5(this);
   cp5start.addButton("start")
     .setPosition(width/2-200, height/2+150)
@@ -82,19 +118,19 @@ void setup() {
   cp5start.addTextfield("username")
     .setPosition(50, 250)
     .setSize(400, 100)
-    .setFocus(true)
+    .setFont(createFont("Arial", 24))
     .setColorBackground(temaFarveKnapper[temaNummer])
     .setColorLabel(temaFarveTekst[temaNummer]);
 
   cp5start.addTextfield("password")
     .setPosition(50, 400)
     .setSize(400, 100)
-    .setFocus(true)
+    .setFont(createFont("Arial", 24))
     .setColorBackground(temaFarveKnapper[temaNummer])
     .setColorLabel(temaFarveTekst[temaNummer]);
 
 
-
+  // HOVEDMENU KNAPPER -----------------------------------------------------------------------------------------------
   cp5hovedmenu = new ControlP5(this);
   cp5hovedmenu.addButton("alarm")
     .setPosition(width/2-150, height/2)
@@ -114,23 +150,50 @@ void setup() {
     .setImage(tandhjul);
 
 
-
+  // ALARM KNAPPER -----------------------------------------------------------------------------------------------
   cp5alarm = new ControlP5(this);
   cp5alarm.addButton("tilbage")
     .setPosition(0, 0)
     .setSize(50, 50)
     .setImage(pil);
 
+  tidInput = cp5alarm.addTextfield("")
+    .setPosition(width/2-150, height/2-100)
+    .setSize(300, 50)
+    .setFont(createFont("Arial", 24))
+    .setText("00:00:00")
+    .setColor(color(0))
+    .setColorBackground(temaFarveKnapper[temaNummer])
+    .setColorActive(temaFarveTekst[temaNummer]);
 
+  startKnap = cp5alarm.addButton("startStopAlarm")
+    .setPosition(width/2-50, height/2)
+    .setSize(100, 50)
+    .setFont(createFont("Arial", 20))
+    .setLabel("Start")
+    .setColorBackground(temaFarveKnapper[temaNummer])
+    .setColorLabel(temaFarveTekst[temaNummer]);
 
+  // STREAK KNAPPER -----------------------------------------------------------------------------------------------
   cp5streak = new ControlP5(this);
   cp5streak.addButton("tilbage")
     .setPosition(0, 0)
     .setSize(50, 50)
     .setImage(pil);
 
+  cp5streak.addButton("godSøvn")
+    .setPosition(100, 350)
+    .setSize(120, 40)
+    .setLabel("God søvn")
+    .setColorBackground(temaFarveKnapper[temaNummer]);
 
+  cp5streak.addButton("dårligSøvn")
+    .setPosition(280, 350)
+    .setSize(120, 40)
+    .setLabel("Dårlig søvn")
+    .setColorBackground(temaFarveKnapper[temaNummer]);
 
+  // INDSTILLINGER KNAPPER -----------------------------------------------------------------------------------------------
   cp5indstillinger = new ControlP5(this);
   cp5indstillinger.addButton("tilbage")
     .setPosition(0, 0)
@@ -144,15 +207,26 @@ void setup() {
     //   .setColorForeground(color(temaFarveKnapper[temaNummer], 200))     HVIS VI VIL HAVE EN ANDEN FARVE TIL SLIDEREN!
     .setColorLabel(temaFarveTekst[temaNummer]);
 
-  d1 = cp5indstillinger.addDropdownList("myList-d1")
-    .setPosition(50, 275)
-    .setSize(400, 100);
+  // Laver en drop down list, fundet på https://www.sojamo.de/libraries/controlP5/examples/controllers/ControlP5dropdownList/ControlP5dropdownList.pde
+  tema = cp5indstillinger.addDropdownList("tema")
+    .setItemHeight(25)
+    .setBarHeight(20)
+    .setColorBackground(color(temaFarveKnapper[temaNummer]))
+    .setColorActive(color(temaFarveKnapper[temaNummer], 150))
+    .setColorForeground(color(temaFarveKnapper[temaNummer], 200))
+    .setColorLabel(color(temaFarveTekst[temaNummer]))
+    .setSize(400, 100)
+    .setPosition(50, 275);
+  for (int i = 0; i < temaer.length; i++) {
+    tema.addItem(temaer[i], i);
+  }
 
-  customize(d1);
   updateVisibility();
   baggrund = 125;
 }
 
+
+// Ser om siderne = true så den kan gå ned i vores void visX og sætter alt op som siden skal se ud.
 void draw() {
   if (forside) {
     visForside();
@@ -165,28 +239,22 @@ void draw() {
   } else if (indstillinger) {
     visIndstillinger();
   }
+  checkAlarm(); // Tjek tiden hver frame
 }
 
-void customize(DropdownList ddl) {
-  ddl.setItemHeight(25);
-  ddl.setBarHeight(20);
-  for (int i = 0; i < temaer.length; i++) {
-    ddl.addItem(temaer[i], i);
-  }
-  ddl.setColorBackground(color(temaFarveKnapper[temaNummer]));
-  ddl.setColorActive(color(temaFarveKnapper[temaNummer], 150));
-  ddl.setColorForeground(color(temaFarveKnapper[temaNummer], 200));
-  ddl.setColorLabel(color(temaFarveTekst[temaNummer]));
-}
+
 
 void controlEvent(ControlEvent theEvent) {
   String name = theEvent.getController().getName();
 
-  if (name.equals("myList-d1")) {
+  if (name.equals("tema")) {
     temaNummer = (int) theEvent.getValue();
     baggrund = temaFarveBaggrund[temaNummer];
   }
 
+
+
+  // Sætter visibiliteten af programmerne så kun de knapper som vi vil have bliver vist --------------------------------------------------------------------------------
   if (name.equals("start")) {
     forside = false;
     streak = false;
@@ -218,6 +286,7 @@ void controlEvent(ControlEvent theEvent) {
 }
 
 
+// Sætter så controlp5 knappernes visibilitet hænger sammen med nogle ord så vi kan ændre det senere -----------------------------------------
 void updateVisibility() {
   cp5start.setVisible(forside);
   cp5hovedmenu.setVisible(hovedmenu);
@@ -226,13 +295,22 @@ void updateVisibility() {
   cp5indstillinger.setVisible(indstillinger);
 }
 
+
+// Sætter hvad de forskellige sider skal vise / skal se ud. ----------------------------------------------------------------------------------
 void visHovedmenu() {
   fill(baggrund);
   rect(0, 0, width, height);
   fill(temaFarveTekst[temaNummer]);
   textAlign(CENTER, CENTER);
   textSize(32);
-  text("Velkommen tilbage "+username, width / 2, height / 4);
+  text("Velkommen tilbage "+username, width / 2, height / 3);
+
+  penge = streakTal * pengeMultiplikator;
+  text("Streak!", width/2, 100);
+  textSize(75);
+  text(streakTal, width/2, 150);
+  textSize(32);
+  text("Du har tjænt " + penge + "kr!", width/2, 200);
 }
 
 void visForside() {
@@ -244,13 +322,30 @@ void visForside() {
   text("Velkommen!", width / 2, height / 4);
 }
 
-void visAlarm () {
+void visAlarm() {
   fill(baggrund);
   rect(0, 0, width, height);
   fill(temaFarveTekst[temaNummer]);
   textAlign(CENTER, CENTER);
   textSize(32);
-  text("Alarm", width / 2, height / 4);
+  text("Alarm", width / 2, 75);
+
+  if (alarmActive && alarmigang) {
+    fill(temaFarveTekst[temaNummer]);
+    text(getRemainingTime(), width/2, 250);
+    alarmColor = color(temaFarveBaggrund[temaNummer]);
+  } else if (alarmstart) {
+    fill(255, 0, 0);
+    text("ALARM!", width/2, 150);
+    alarmColor = color(255, 200, 200);
+    alarm_1.play();
+    delay(3500);
+    alarm_1.stop();
+  } else {
+    fill(temaFarveTekst[temaNummer]);
+    text("Hvor lang tid vil du sove i?", width/2, 250);
+    alarmColor = color(temaFarveBaggrund[temaNummer]);
+  }
 }
 
 void visStreak() {
@@ -258,8 +353,33 @@ void visStreak() {
   rect(0, 0, width, height);
   fill(temaFarveTekst[temaNummer]);
   textAlign(CENTER, CENTER);
+
+  // Streak counter
   textSize(32);
-  text("Streak", width / 2, height / 4);
+  text("Streak " + streakTal + "!", width / 2, 100);
+
+  textSize(18);
+  text("Streak der viser hvor mange dage du har sovet godt", width / 2, 150);
+
+  kalender();
+  tjekTimerTid();
+
+  // Vis/skjul knapper baseret på lock status
+  if (registresøvn) {
+    cp5streak.getController("godSøvn").show();
+    cp5streak.getController("dårligSøvn").show();
+    textSize(16);
+    fill(100);
+    text("Registrer din søvnkvalitet", width/2, 420);
+  } else {
+    cp5streak.getController("godSøvn").hide();
+    cp5streak.getController("dårligSøvn").hide();
+
+    // Vis nedtælling
+    textSize(20);
+    fill(200, 0, 0);
+    text("Kommer igen om: " + TidTilbage(), width/2, 420);
+  }
 }
 
 void visIndstillinger() {
@@ -269,4 +389,117 @@ void visIndstillinger() {
   textAlign(CENTER, CENTER);
   textSize(32);
   text("indstillinger", width / 2, height / 8);
+}
+
+void startStopAlarm() {
+  if (alarmActive == false) {
+    totalSekunder = konverterTid(tidInput.getText());
+    if (totalSekunder > 0) {
+      setAlarm(totalSekunder);
+      alarmActive = true;
+      startKnap.setLabel("Stop");
+    }
+  } else {
+    alarmActive = false;
+    alarmigang = false;
+    alarmstart = false;
+    startKnap.setLabel("Start");
+    alarmColor = color(240);
+  }
+}
+
+//Her laver vi alt til alarmen ----------------------------------------------------------------------------------------------------
+void setAlarm(int sekunder) {
+  alarmtilbage = sekunder * 1000;
+  alarmstartid = millis();
+  alarmigang = true;
+  alarmstart = false;
+}
+
+void checkAlarm() {
+  if (alarmigang && (millis() - alarmstartid) >= alarmtilbage) {
+    alarmigang = false;
+    alarmstart = true;
+    println("ALARM!");
+  }
+}
+
+String getRemainingTime() {
+  if (alarmigang == false) return "00:00:00";
+
+  tilbage = max(0, alarmtilbage - (millis() - alarmstartid));
+  timer = tilbage / 3600000;
+  tilbage %= 3600000;
+  minutter = tilbage / 60000;
+  tilbage %= 60000;
+  sekunder = tilbage / 1000;
+
+  return nf(timer, 2) + ":" + nf(minutter, 2) + ":" + nf(sekunder, 2); // Her laver vi formatet om så det ser rigtigt ud.
+}
+
+int konverterTid(String tid) {
+  String[] del = tid.split(":"); // Her splitter vi tid-strengen i timer, minutter, sekunder
+  if (del.length != 3) return 0; // Her tjekker vi om der er 3 dele  vi
+
+  // Her laver vi hver del til tal så det kan blive regnet med
+  int timer1 = int(del[0]);
+  int minutter1 = int(del[1]);
+  int sekunder1 = int(del[2]);
+
+  // Returner totalt antal sekunder
+  return timer1 * 3600 + minutter1 * 60 + sekunder1;
+}
+
+
+// Her laver vi alt med streak at gøre ---------------------------------------------------------
+void kalender() {
+
+  // Tegn kalender
+  textSize(16);
+  for (int i = 0; i < 7; i++) {
+    // Dag-navn
+    fill(temaFarveTekst[temaNummer]);
+    text(ugedage[i], startX + i*(boksStørelse+Mellemrum) + boksStørelse/2, 250);
+
+
+    if (i == 0) {
+      fill(registresøvn ? color(200) : color(0, 200, 0));
+    } else {
+      fill(150);
+    }
+    rect(startX + i*(boksStørelse+Mellemrum), 270, boksStørelse, boksStørelse, 5);
+  }
+}
+
+// Her laver vi en timer til vores tingest som jeg ikke kan huske.
+void tjekTimerTid() {
+  if (registresøvn == false && millis() - timerStartTid >= timerTid) {
+    registresøvn = true;
+  }
+}
+
+String TidTilbage() {
+  int remaining = timerTid - (millis() - timerStartTid);
+  int timer = remaining / 3600000;
+  int minutter = (remaining % 3600000) / 60000;
+  return nf(timer, 2) + "t " + nf(minutter, 2) + "m";
+}
+
+void godSøvn() {
+  if (registresøvn) {
+    streakTal++;
+    startTimer();
+  }
+}
+
+void dårligSøvn() {
+  if (registresøvn) {
+    streakTal = 0;
+    startTimer();
+  }
+}
+
+void startTimer() {
+  registresøvn = false;
+  timerStartTid = millis();
 }
