@@ -1,0 +1,148 @@
+class Hangman implements IGame {
+  char[] wordArray;   // Ordet gemt som tegn-array
+  boolean[] guessed;  // Hvilke bogstaver er gættet
+  char[] forkert;     // Liste over forkerte gæt
+  int forkertCount;   // Hvor mange forkerte gæt
+  int lives;          // Liv tilbage
+
+  Hangman(String w) {
+    wordArray = new char[w.length()];
+    for (int i = 0; i < w.length(); i++) {
+      wordArray[i] = w.charAt(i); // fyld array med tegn
+    }
+    guessed = new boolean[w.length()];
+    forkert = new char[26]; // plads til fejl bogstaver
+    forkertCount = 0;
+    lives = 6;
+  }
+
+  void guessLetter(char bogstav) {
+    boolean fundetBogstav = false;
+
+
+    for (int i = 0; i < wordArray.length; i++) {
+      if (wordArray[i] == bogstav) {
+        guessed[i] = true;
+        fundetBogstav = true;
+      }
+    }
+    if (fundetBogstav == false) {
+      boolean alleredeGættet = false;
+
+      for (int i = 0; i < forkertCount; i++) {
+        if (forkert[i] == bogstav) {
+          alleredeGættet = true;
+        }
+      }
+   
+   
+      if (alleredeGættet == false) {
+        forkert[forkertCount] = bogstav;
+        forkertCount++;
+        lives--;
+      }
+    }
+  }
+
+  boolean fuldendtOrd() {
+    for (int i = 0; i < guessed.length; i++) {
+      if (guessed[i] == false) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void show() {
+    strokeWeight(3);
+
+    // Galgen
+    line(400, 350, 500, 350); // bund
+    line(450, 350, 450, 100); // lodret
+    line(450, 100, 520, 100); // top
+    line(520, 100, 520, 130); // snor
+
+    int wrong = 6 - lives;
+
+    if (wrong > 0) ellipse(520, 150, 40, 40); // hoved
+    if (wrong > 1) line(520, 170, 520, 240); // krop
+    if (wrong > 2) line(520, 180, 490, 210); // venstre arm
+    if (wrong > 3) line(520, 180, 550, 210); // højre arm
+    if (wrong > 4) line(520, 240, 490, 280); // venstre ben
+    if (wrong > 5) line(520, 240, 550, 280); // højre ben
+  }
+}
+
+interface IGame {
+  void guessLetter(char bogstav);
+  boolean fuldendtOrd();
+  void show();
+}
+
+Hangman hangman;
+boolean gameOver = false;
+boolean gameWon = false;
+int gameOverTime = 0;
+
+void setup() {
+  size(600, 400);
+  textSize(24);
+  hangman = new Hangman("ABC123");
+}
+
+void draw() {
+  background(200);
+
+  text("Gæt ordet:", 50, 50);
+  String display = "";
+  for (int i = 0; i < hangman.wordArray.length; i++) {
+    if (hangman.guessed[i] == true) {
+      display += hangman.wordArray[i] + " ";
+    } else {
+      display += "_ ";
+    }
+  }
+
+  text(display, 50, 100);
+
+  String fejlDisplay = "";
+  for (int i = 0; i < hangman.forkertCount; i++) {
+    fejlDisplay += hangman.forkert[i] + " ";
+  }
+  text("Forkerte gæt: " + fejlDisplay, 50, 150);
+
+
+  if (hangman.fuldendtOrd() == true && gameOver == false) {
+    gameWon = true;
+    gameOver = true;
+    gameOverTime = millis();
+  }
+  if (hangman.lives == 0 && gameOver == false) {
+    gameWon = false;
+    gameOver = true;
+    gameOverTime = millis();
+  }
+
+  if (gameOver == true) {
+    if (gameWon == true) {
+      background(#0AF05C);
+      text("TILLYKKE! Du gættede ordet!", 50, 300);
+    } else {
+      background(#F00A0A);
+      text("DU TABTE! Ordet var: " + String.valueOf(hangman.wordArray), 50, 300);
+      text("Programmet lukker om " + (10 - (millis() - gameOverTime) / 1000) + " sekunder", 50, 350);
+    }
+
+    if (millis() - gameOverTime >= 10000) {
+      exit();
+    }
+  }
+
+  hangman.show();
+}
+
+void keyPressed() {
+  if (gameOver == false) {
+    hangman.guessLetter(key);
+  }
+}
